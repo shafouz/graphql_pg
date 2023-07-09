@@ -1,0 +1,31 @@
+{
+  "name": "gql",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "start": "npm run compile && npx sequelize db:migrate && node ./dist/index.js",
+    "compile": "npm run generate && tsc",
+    "generate": "graphql-codegen --config codegen.ts",
+    "seed": "npx sequelize db:seed:all",
+    "build-cli": "cargo build --release --manifest-path cli/Cargo.toml --bin gql",
+    "gql": "./cli/target/release/gql $@"
+  },
+  "author": "shafouz",
+  "license": "ISC",
+  "dependencies": {
+    "graphile-utils": "^4.13.0",
+    "pg": "^8.11.1",
+    "postgraphile": "^4.13.0",
+    "sequelize": "^6.32.1"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "4.0.1",
+    "@graphql-codegen/introspection": "4.0.0",
+    "@graphql-codegen/typescript": "4.0.1",
+    "@graphql-codegen/typescript-resolvers": "4.0.1",
+    "@types/node": "^20.4.0",
+    "sequelize-cli": "^6.6.1",
+    "typescript": "^5.1.6"
+  }
+}
