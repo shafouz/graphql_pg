@@ -46,8 +46,8 @@ type Query implements Node {
     condition: SequelizeMetaCondition
   ): SequelizeMetasConnection
 
-  """Reads and enables pagination through a set of `User`."""
-  allUsers(
+  """Reads and enables pagination through a set of `Domain`."""
+  allDomains(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -66,21 +66,20 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering `User`."""
-    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering `Domain`."""
+    orderBy: [DomainsOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: UserCondition
-  ): UsersConnection
+    condition: DomainCondition
+  ): DomainsConnection
   sequelizeMetaByName(name: String!): SequelizeMeta
-  userById(id: Int!): User
-  userByName(name: String!): User
-  userByEmail(email: String!): User
+  domainById(id: Int!): Domain
+  domainByName(name: String!): Domain
 
-  """Reads and enables pagination through a set of `User`."""
-  searchUser(
+  """Reads and enables pagination through a set of `Domain`."""
+  searchTagByValue(
     search: String!
 
     """Only read the first `n` values of the set."""
@@ -100,7 +99,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): UsersConnection
+  ): DomainsConnection
 
   """Reads a single `SequelizeMeta` using its globally unique `ID`."""
   sequelizeMeta(
@@ -110,11 +109,11 @@ type Query implements Node {
     nodeId: ID!
   ): SequelizeMeta
 
-  """Reads a single `User` using its globally unique `ID`."""
-  user(
-    """The globally unique `ID` to be used in selecting a single `User`."""
+  """Reads a single `Domain` using its globally unique `ID`."""
+  domain(
+    """The globally unique `ID` to be used in selecting a single `Domain`."""
     nodeId: ID!
-  ): User
+  ): Domain
 }
 
 """An object with a globally unique `ID`."""
@@ -195,64 +194,63 @@ input SequelizeMetaCondition {
   name: String
 }
 
-"""A connection to a list of `User` values."""
-type UsersConnection {
-  """A list of `User` objects."""
-  nodes: [User]!
+"""A connection to a list of `Domain` values."""
+type DomainsConnection {
+  """A list of `Domain` objects."""
+  nodes: [Domain]!
 
   """
-  A list of edges which contains the `User` and cursor to aid in pagination.
+  A list of edges which contains the `Domain` and cursor to aid in pagination.
   """
-  edges: [UsersEdge!]!
+  edges: [DomainsEdge!]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `User` you could get from the connection."""
+  """The count of *all* `Domain` you could get from the connection."""
   totalCount: Int!
 }
 
-type User implements Node {
+type Domain implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
   id: Int!
   name: String!
-  email: String!
-  picture: String
-  hash: String
+  tags: JSON
   updatedAt: Time
   createdAt: Time
 }
+
+"""
+A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
 
 """
 The exact time of day, does not include the date. May or may not have a timezone offset.
 """
 scalar Time
 
-"""A `User` edge in the connection."""
-type UsersEdge {
+"""A `Domain` edge in the connection."""
+type DomainsEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `User` at the end of the edge."""
-  node: User
+  """The `Domain` at the end of the edge."""
+  node: Domain
 }
 
-"""Methods to use when ordering `User`."""
-enum UsersOrderBy {
+"""Methods to use when ordering `Domain`."""
+enum DomainsOrderBy {
   NATURAL
   ID_ASC
   ID_DESC
   NAME_ASC
   NAME_DESC
-  EMAIL_ASC
-  EMAIL_DESC
-  PICTURE_ASC
-  PICTURE_DESC
-  HASH_ASC
-  HASH_DESC
+  TAGS_ASC
+  TAGS_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
   CREATED_AT_ASC
@@ -262,23 +260,17 @@ enum UsersOrderBy {
 }
 
 """
-A condition to be used against `User` object types. All fields are tested for equality and combined with a logical ‘and.’
+A condition to be used against `Domain` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
-input UserCondition {
+input DomainCondition {
   """Checks for equality with the object’s `id` field."""
   id: Int
 
   """Checks for equality with the object’s `name` field."""
   name: String
 
-  """Checks for equality with the object’s `email` field."""
-  email: String
-
-  """Checks for equality with the object’s `picture` field."""
-  picture: String
-
-  """Checks for equality with the object’s `hash` field."""
-  hash: String
+  """Checks for equality with the object’s `tags` field."""
+  tags: JSON
 
   """Checks for equality with the object’s `updatedAt` field."""
   updatedAt: Time
@@ -299,13 +291,13 @@ type Mutation {
     input: CreateSequelizeMetaInput!
   ): CreateSequelizeMetaPayload
 
-  """Creates a single `User`."""
-  createUser(
+  """Creates a single `Domain`."""
+  createDomain(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateUserInput!
-  ): CreateUserPayload
+    input: CreateDomainInput!
+  ): CreateDomainPayload
 
   """
   Updates a single `SequelizeMeta` using its globally unique id and a patch.
@@ -325,37 +317,29 @@ type Mutation {
     input: UpdateSequelizeMetaByNameInput!
   ): UpdateSequelizeMetaPayload
 
-  """Updates a single `User` using its globally unique id and a patch."""
-  updateUser(
+  """Updates a single `Domain` using its globally unique id and a patch."""
+  updateDomain(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateUserInput!
-  ): UpdateUserPayload
+    input: UpdateDomainInput!
+  ): UpdateDomainPayload
 
-  """Updates a single `User` using a unique key and a patch."""
-  updateUserById(
+  """Updates a single `Domain` using a unique key and a patch."""
+  updateDomainById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateUserByIdInput!
-  ): UpdateUserPayload
+    input: UpdateDomainByIdInput!
+  ): UpdateDomainPayload
 
-  """Updates a single `User` using a unique key and a patch."""
-  updateUserByName(
+  """Updates a single `Domain` using a unique key and a patch."""
+  updateDomainByName(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateUserByNameInput!
-  ): UpdateUserPayload
-
-  """Updates a single `User` using a unique key and a patch."""
-  updateUserByEmail(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateUserByEmailInput!
-  ): UpdateUserPayload
+    input: UpdateDomainByNameInput!
+  ): UpdateDomainPayload
 
   """Deletes a single `SequelizeMeta` using its globally unique id."""
   deleteSequelizeMeta(
@@ -373,37 +357,29 @@ type Mutation {
     input: DeleteSequelizeMetaByNameInput!
   ): DeleteSequelizeMetaPayload
 
-  """Deletes a single `User` using its globally unique id."""
-  deleteUser(
+  """Deletes a single `Domain` using its globally unique id."""
+  deleteDomain(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteUserInput!
-  ): DeleteUserPayload
+    input: DeleteDomainInput!
+  ): DeleteDomainPayload
 
-  """Deletes a single `User` using a unique key."""
-  deleteUserById(
+  """Deletes a single `Domain` using a unique key."""
+  deleteDomainById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteUserByIdInput!
-  ): DeleteUserPayload
+    input: DeleteDomainByIdInput!
+  ): DeleteDomainPayload
 
-  """Deletes a single `User` using a unique key."""
-  deleteUserByName(
+  """Deletes a single `Domain` using a unique key."""
+  deleteDomainByName(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteUserByNameInput!
-  ): DeleteUserPayload
-
-  """Deletes a single `User` using a unique key."""
-  deleteUserByEmail(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteUserByEmailInput!
-  ): DeleteUserPayload
+    input: DeleteDomainByNameInput!
+  ): DeleteDomainPayload
 }
 
 """The output of our create `SequelizeMeta` mutation."""
@@ -446,48 +422,46 @@ input SequelizeMetaInput {
   name: String!
 }
 
-"""The output of our create `User` mutation."""
-type CreateUserPayload {
+"""The output of our create `Domain` mutation."""
+type CreateDomainPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `User` that was created by this mutation."""
-  user: User
+  """The `Domain` that was created by this mutation."""
+  domain: Domain
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `User`. May be used by Relay 1."""
-  userEdge(
-    """The method to use when ordering `User`."""
-    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
-  ): UsersEdge
+  """An edge for our `Domain`. May be used by Relay 1."""
+  domainEdge(
+    """The method to use when ordering `Domain`."""
+    orderBy: [DomainsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): DomainsEdge
 }
 
-"""All input for the create `User` mutation."""
-input CreateUserInput {
+"""All input for the create `Domain` mutation."""
+input CreateDomainInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `User` to be created by this mutation."""
-  user: UserInput!
+  """The `Domain` to be created by this mutation."""
+  domain: DomainInput!
 }
 
-"""An input for mutations affecting `User`"""
-input UserInput {
+"""An input for mutations affecting `Domain`"""
+input DomainInput {
   id: Int
   name: String!
-  email: String!
-  picture: String
-  hash: String
+  tags: JSON
   updatedAt: Time
   createdAt: Time
 }
@@ -556,31 +530,31 @@ input UpdateSequelizeMetaByNameInput {
   name: String!
 }
 
-"""The output of our update `User` mutation."""
-type UpdateUserPayload {
+"""The output of our update `Domain` mutation."""
+type UpdateDomainPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `User` that was updated by this mutation."""
-  user: User
+  """The `Domain` that was updated by this mutation."""
+  domain: Domain
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `User`. May be used by Relay 1."""
-  userEdge(
-    """The method to use when ordering `User`."""
-    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
-  ): UsersEdge
+  """An edge for our `Domain`. May be used by Relay 1."""
+  domainEdge(
+    """The method to use when ordering `Domain`."""
+    orderBy: [DomainsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): DomainsEdge
 }
 
-"""All input for the `updateUser` mutation."""
-input UpdateUserInput {
+"""All input for the `updateDomain` mutation."""
+input UpdateDomainInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -588,29 +562,29 @@ input UpdateUserInput {
   clientMutationId: String
 
   """
-  The globally unique `ID` which will identify a single `User` to be updated.
+  The globally unique `ID` which will identify a single `Domain` to be updated.
   """
   nodeId: ID!
 
   """
-  An object where the defined keys will be set on the `User` being updated.
+  An object where the defined keys will be set on the `Domain` being updated.
   """
-  userPatch: UserPatch!
+  domainPatch: DomainPatch!
 }
 
-"""Represents an update to a `User`. Fields that are set will be updated."""
-input UserPatch {
+"""
+Represents an update to a `Domain`. Fields that are set will be updated.
+"""
+input DomainPatch {
   id: Int
   name: String
-  email: String
-  picture: String
-  hash: String
+  tags: JSON
   updatedAt: Time
   createdAt: Time
 }
 
-"""All input for the `updateUserById` mutation."""
-input UpdateUserByIdInput {
+"""All input for the `updateDomainById` mutation."""
+input UpdateDomainByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -618,14 +592,14 @@ input UpdateUserByIdInput {
   clientMutationId: String
 
   """
-  An object where the defined keys will be set on the `User` being updated.
+  An object where the defined keys will be set on the `Domain` being updated.
   """
-  userPatch: UserPatch!
+  domainPatch: DomainPatch!
   id: Int!
 }
 
-"""All input for the `updateUserByName` mutation."""
-input UpdateUserByNameInput {
+"""All input for the `updateDomainByName` mutation."""
+input UpdateDomainByNameInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -633,25 +607,10 @@ input UpdateUserByNameInput {
   clientMutationId: String
 
   """
-  An object where the defined keys will be set on the `User` being updated.
+  An object where the defined keys will be set on the `Domain` being updated.
   """
-  userPatch: UserPatch!
+  domainPatch: DomainPatch!
   name: String!
-}
-
-"""All input for the `updateUserByEmail` mutation."""
-input UpdateUserByEmailInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  An object where the defined keys will be set on the `User` being updated.
-  """
-  userPatch: UserPatch!
-  email: String!
 }
 
 """The output of our delete `SequelizeMeta` mutation."""
@@ -702,32 +661,32 @@ input DeleteSequelizeMetaByNameInput {
   name: String!
 }
 
-"""The output of our delete `User` mutation."""
-type DeleteUserPayload {
+"""The output of our delete `Domain` mutation."""
+type DeleteDomainPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `User` that was deleted by this mutation."""
-  user: User
-  deletedUserId: ID
+  """The `Domain` that was deleted by this mutation."""
+  domain: Domain
+  deletedDomainId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `User`. May be used by Relay 1."""
-  userEdge(
-    """The method to use when ordering `User`."""
-    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
-  ): UsersEdge
+  """An edge for our `Domain`. May be used by Relay 1."""
+  domainEdge(
+    """The method to use when ordering `Domain`."""
+    orderBy: [DomainsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): DomainsEdge
 }
 
-"""All input for the `deleteUser` mutation."""
-input DeleteUserInput {
+"""All input for the `deleteDomain` mutation."""
+input DeleteDomainInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -735,13 +694,13 @@ input DeleteUserInput {
   clientMutationId: String
 
   """
-  The globally unique `ID` which will identify a single `User` to be deleted.
+  The globally unique `ID` which will identify a single `Domain` to be deleted.
   """
   nodeId: ID!
 }
 
-"""All input for the `deleteUserById` mutation."""
-input DeleteUserByIdInput {
+"""All input for the `deleteDomainById` mutation."""
+input DeleteDomainByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -750,22 +709,12 @@ input DeleteUserByIdInput {
   id: Int!
 }
 
-"""All input for the `deleteUserByName` mutation."""
-input DeleteUserByNameInput {
+"""All input for the `deleteDomainByName` mutation."""
+input DeleteDomainByNameInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
   name: String!
-}
-
-"""All input for the `deleteUserByEmail` mutation."""
-input DeleteUserByEmailInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  email: String!
 }

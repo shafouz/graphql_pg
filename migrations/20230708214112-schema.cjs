@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("user", {
+    await queryInterface.createTable("domain", {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -14,32 +14,26 @@ module.exports = {
         unique: true,
         allowNull: false,
       },
-      email: {
-        type: Sequelize.STRING,
-        unique: true,
-        allowNull: false,
+      tags: {
+        type: Sequelize.JSONB,
+        defaultValue: "{}",
       },
-      picture: Sequelize.STRING,
-      hash: Sequelize.STRING,
       updatedAt: Sequelize.TIME,
       createdAt: Sequelize.TIME,
     });
 
     await queryInterface.createFunction(
-      "search_user",
+      '"searchTagByValue"',
       [{ type: "text", name: "search" }],
-      `SETOF "user"`,
-      // `TABLE (name text, email text)`,
+      `SETOF "domain"`,
       "plpgsql",
-      `RETURN query(SELECT * FROM "user" WHERE "name" ILIKE ('%' || search || '%') OR "email" ILIKE ('%' || search || '%'));`,
+      `RETURN query(SELECT * FROM domain WHERE tags->>search IS NOT NULL);`,
       ["immutable strict"]
     );
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropFunction("search_user", [
-      { type: "text", name: "search" },
-    ]);
-    await queryInterface.dropTable("user");
+    await queryInterface.dropFunction("searchTagByValue", []);
+    await queryInterface.dropTable("domain");
   },
 };

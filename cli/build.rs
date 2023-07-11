@@ -8,11 +8,36 @@ use std::fs::read_to_string;
 use std::fs::write;
 
 fn main() -> Result<(), anyhow::Error> {
-    let mut code = quote!();
-    let names_variables_and_types = query_attrs()?;
+    // let mut code = quote!();
+    // let names_variables_and_types = query_attrs("../query.graphql");
+    //
+    // build_from_schema(&names_variables_and_types, &mut code)?;
+    // build_main(&names_variables_and_types)?;
 
-    build_from_schema(&names_variables_and_types, &mut code)?;
-    build_main(&names_variables_and_types)?;
+    Ok(())
+}
+
+fn build_scalars(code: &mut TokenStream, schema: &str) -> Result<(), anyhow::Error> {
+    let query = read_to_string(schema).unwrap();
+    let parser = Parser::new(&query);
+    let ast = parser.parse();
+
+    for def in ast.document().definitions() {
+        if let Definition::ScalarTypeDefinition(scalar) = def {
+            let text = scalar.name().unwrap().text();
+            let scalar = format_ident!("{}", text.to_string());
+
+            if text.as_str() == "JSON" {
+                code.extend(quote! {
+                    type #scalar = Vec<String>;
+                });
+            } else {
+                code.extend(quote! {
+                    type #scalar = String;
+                });
+            }
+        };
+    }
 
     Ok(())
 }
@@ -40,12 +65,13 @@ fn build_main(
 
             quote! {
                 QueryName::#name { #(#variables),* } => {
-                    #name::build_query(#snake_name::Variables { #(#variables),* })
+                    #name::build_query(#snake_name::Variables { #(#variables: #variables.to_string()),* })
                 },
             }
         })
         .collect();
 
+    eprintln!("DEBUGPRINT[2]: procs.rs:46: strukts={:#?}", strukts);
     let code = quote! {
         mod generated;
 
@@ -89,10 +115,7 @@ fn build_main(
         }
     };
 
-    let syntax_tree = syn::parse_file(&code.to_string()).unwrap();
-    let formatted = prettyplease::unparse(&syntax_tree);
-
-    write("src/main.rs", formatted)?;
+    write("src/main.rs", code.to_string())?;
     Ok(())
 }
 
@@ -101,9 +124,12 @@ fn build_from_schema(
     code: &mut TokenStream,
 ) -> Result<(), anyhow::Error> {
     code.extend(quote! {
+        use clap_stdin::MaybeStdin;
         use clap::{Parser, Subcommand};
         use graphql_client::{GraphQLQuery};
     });
+
+    build_scalars(code, "../schema.graphql")?;
 
     for (name, _) in names_variables_and_types {
         let name = format_ident! {
@@ -122,6 +148,7 @@ fn build_from_schema(
     let syntax_tree = syn::parse_file(&code.to_string()).unwrap();
     let formatted = prettyplease::unparse(&syntax_tree);
 
+    eprintln!("DEBUGPRINT[1]: procs.rs:17: formatted={}", formatted);
     write("src/generated.rs", formatted)?;
     Ok(())
 }
@@ -149,7 +176,7 @@ fn build_args(
                 #[derive(Debug, Clone, Subcommand)]
                 #[command(rename_all = "snake_case")]
                 pub enum QueryName {
-                    #name { #(#variables:#types),* }
+                    #name { #(#variables:MaybeStdin<#types>),* }
                 }
             }
         })
@@ -179,8 +206,8 @@ fn build_args(
     });
 }
 
-fn query_attrs() -> Result<Vec<(String, Vec<(String, String)>)>, anyhow::Error> {
-    let query = read_to_string("../query.graphql")?;
+fn query_attrs(schema: &str) -> Vec<(String, Vec<(String, String)>)> {
+    let query = read_to_string(schema).unwrap();
     let parser = Parser::new(&query);
     let ast = parser.parse();
 
@@ -261,5 +288,5 @@ fn query_attrs() -> Result<Vec<(String, Vec<(String, String)>)>, anyhow::Error> 
         })
         .collect::<Vec<(String, Vec<(String, String)>)>>();
 
-    Ok(query_names)
+    query_names
 }

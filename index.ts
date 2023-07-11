@@ -5,7 +5,7 @@ import { MyPlugin } from "./src/plugin.js";
 const port = process.env.PORT || 3000;
 console.log(`Server started: ${port}`);
 
-createServer(
+const server = createServer(
   postgraphile(
     "postgres://postgres:postgres@127.0.0.1:5432/postgres",
     "public",
@@ -14,7 +14,9 @@ createServer(
       graphiql: true,
       enhanceGraphiql: true,
       exportGqlSchemaPath: "schema.graphql",
-      appendPlugins: [MyPlugin],
+      // appendPlugins: [MyPlugin],
     }
   )
-).listen(port);
+);
+
+server.listen(port);

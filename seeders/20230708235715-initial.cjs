@@ -4,17 +4,17 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert(
-      "user",
+      "domain",
       [
         {
-          name: "laalsdlasld",
-          email: "laalsdlasld",
+          name: "laalsdlasld.com",
+          tags: JSON.stringify({ something: "something" }),
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          name: "asdasdasd",
-          email: "asdasdasd",
+          name: "asdasdasd.com",
+          tags: JSON.stringify({ something: "asdasdas" }),
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -23,5 +23,5 @@ module.exports = {
     );
   },
 
-  async down(queryInterface, Sequelize) {},
+  async down(queryInterface, Sequelize) { },
 };

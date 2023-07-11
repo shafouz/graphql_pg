@@ -4,10 +4,10 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "start": "npm run compile && npx sequelize db:migrate && node ./dist/index.js",
+    "start": "npm run compile && node ./dist/index.js",
     "compile": "npm run generate && tsc",
     "generate": "graphql-codegen --config codegen.ts",
-    "seed": "npx sequelize db:seed:all",
+    "prepare": "npx sequelize db:migrate && npx sequelize db:seed:all",
     "build-cli": "cargo build --release --manifest-path cli/Cargo.toml --bin gql",
     "gql": "./cli/target/release/gql $@"
   },
@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "graphile-utils": "^4.13.0",
+    "node-fetch": "^3.3.1",
     "pg": "^8.11.1",
     "postgraphile": "^4.13.0",
     "sequelize": "^6.32.1"

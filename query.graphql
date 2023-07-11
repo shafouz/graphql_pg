@@ -1,5 +1,18 @@
-query UserById($id: Int!) {
-  userById(id: $id) {
-    name
+query SearchTagByValue($search: String!) {
+  searchTagByValue(search: $search) {
+    nodes {
+      createdAt
+      id
+      name
+      nodeId
+      tags
+      updatedAt
+    }
+  }
+}
+
+mutation CreateDomain($domain: String!, $tags: JSON!) {
+  createDomain(input: { domain: { name: $domain, tags: $tags } }) {
+    clientMutationId
   }
 }
